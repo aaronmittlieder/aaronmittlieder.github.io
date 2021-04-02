@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.81.0" />
+
+
+<title>Is Ndamukong Suh a HOF? - Aaron Mittlieder</title>
+<meta property="og:title" content="Is Ndamukong Suh a HOF? - Aaron Mittlieder">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/aaronmittlieder">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/aronmitty">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">10 min read</span>
+    
+
+    <h1 class="article-title">Is Ndamukong Suh a HOF?</h1>
+
+    
+    <span class="article-date">2021-03-29</span>
+    
+
+    <div class="article-content">
+      
+<script src="/2021/03/29/is-ndamukong-suh-a-hof/index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>In these graphs, I will look deep into the statistics and the rankings of the great defensive tackles in the NFL. This will help me understand if Ndamukong Suh is a Hall of Fame caliber defensive tackle already or if he is well on his way. Suh is an NFL veteran from the University of Nebraska with 52 pro bowl appearances and he is going into his 12th year as a pro.</p>
+<p>Here in this code, I am importing the necessary libraries to make these charts.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+## ✓ tibble  3.0.5     ✓ dplyr   1.0.3
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.4.0     ✓ forcats 0.5.0</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(scales)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;scales&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     discard</code></pre>
+<pre><code>## The following object is masked from &#39;package:readr&#39;:
+## 
+##     col_factor</code></pre>
+<pre class="r"><code>library(gt)</code></pre>
+<p>Now I have to import the data. The data set I used measures the top defensive tackles in the league by their Hall of Fame Monitor. The Hall of Fame Monitor is a rating scale created by Pro Football Reference that takes in account each players stats, pro bowls, championships and other accomplishments to calculate their Hall of Fame Status.</p>
+<pre class="r"><code>dthofstats &lt;- read_csv(&quot;dt_hof_stats.csv&quot;)</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   .default = col_double(),
+##   Player = col_character()
+## )
+## ℹ Use `spec()` for the full column specifications.</code></pre>
+<p>This line of code filters the original data set, but only players who have played past 1987. I did this because the NFL did not measure defensive tackle statistics fully until around that time. This allows me to accurately compare Suh and the rest of the great defensive tackles who have their respective statistics recorded.</p>
+<pre class="r"><code>dthofstats %&gt;% mutate(Player=gsub(&quot;\\\\.*&quot;,&quot;&quot;,Player)) %&gt;% filter(From &gt; &#39;1987&#39;) -&gt; moderndtstats </code></pre>
+<p>Now I want to get a data set of just the top 10 players by their Hall of Fame Monitor using the new Modern stats data set I made above.</p>
+<pre class="r"><code>top10hofm &lt;- moderndtstats %&gt;%
+  arrange(desc(HOFm)) %&gt;% 
+  top_n(10) %&gt;% 
+  select(Player, HOFm)</code></pre>
+<pre><code>## Selecting by QBHits</code></pre>
+<p>In this code, I created data sets for certain players that I want to highlight and compare to Suh for my graphs later on in this investigation.</p>
+<pre class="r"><code>compare &lt;- moderndtstats %&gt;%
+  arrange(desc(HOFm)) %&gt;% 
+  top_n(10, wt=HOFm) # just want a top 10 list
+
+suh &lt;- compare %&gt;% filter(Player == &quot;Ndamukong Suh&quot;)
+
+randle &lt;- compare %&gt;% filter(Player == &quot;John Randle&quot;)
+
+sapp &lt;- compare %&gt;% filter(Player == &quot;Warren Sapp&quot;)
+
+donald &lt;- compare %&gt;% filter(Player == &quot;Aaron Donald&quot;)
+
+atkins &lt;- compare %&gt;% filter(Player == &quot;Geno Atkins&quot;)
+
+avghof &lt;- dthofstats %&gt;% filter(Player == &quot;Average HOF DT&quot;)</code></pre>
+<p>In my first graphic, I made a gt table that simply shows the top 10 defensive tackles ranked by their Hall of Fame monitor in the Modern Era. Right away, I noticed Suh sat right up there in the top 6 with John Randle and Warren Sapp, who are current Hall of Famers. We can also take in account the fact that Suh has still got some life left in his career, and his Solo Tackles and Tackles for Loss are right in the same waters of the greats. This can immediately tell us that, at the very least, Suh is close to the beloved Hall of Fame status.</p>
+<pre class="r"><code>compare %&gt;% 
+  select(Player, TFL, Solo) %&gt;%
+  gt() %&gt;% 
+  cols_label(
+    Player = &quot;Player&quot;,
+    TFL = &quot;Tackles for Loss&quot;,
+    Solo = &quot;Solo Tackles&quot;
+  ) %&gt;%
+  tab_header(
+    title = &quot;The top ten DT in the Modern Era&quot;,
+    subtitle = &quot;Suh sits in the top 10 right at the 6th spot. His TFL and Solo&#39;s rank right there with the greats.&quot;
+  ) %&gt;% tab_style(
+    style = cell_text(color = &quot;black&quot;, weight = &quot;bold&quot;, align = &quot;left&quot;),
+    locations = cells_title(&quot;title&quot;)
+  ) %&gt;% tab_style(
+    style = cell_text(color = &quot;black&quot;, align = &quot;left&quot;),
+    locations = cells_title(&quot;subtitle&quot;)
+  ) %&gt;%
+  tab_source_note(
+    source_note = &quot;By Aaron Mittlieder&quot;
+  ) %&gt;%
+  tab_source_note(
+    source_note = md(&quot;Source: [Pro Football Reference](https://www.pro-football-reference.com/)&quot;)
+  ) %&gt;% tab_style(
+    style = cell_text(color = &quot;black&quot;, weight = &quot;bold&quot;, size=18),
+    locations = cells_body(
+      columns = vars(Player)
+    )
+  ) %&gt;% 
+  tab_style(
+    style = cell_text(color = &quot;red&quot;, weight = &quot;bold&quot;),
+    locations = cells_body(
+      columns = vars(TFL),
+      rows = TFL == 123
+    )
+  ) %&gt;% 
+  tab_style(
+    style = cell_text(color = &quot;red&quot;, weight = &quot;bold&quot;),
+    locations = cells_body(
+      columns = vars(Solo),
+      rows = Solo == 373
+    )
+  ) </code></pre>
+<pre><code>## Warning: The `.dots` argument of `group_by()` is deprecated as of dplyr 1.0.0.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.</code></pre>
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#qtguximztu .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#qtguximztu .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qtguximztu .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#qtguximztu .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#qtguximztu .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qtguximztu .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#qtguximztu .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#qtguximztu .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#qtguximztu .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#qtguximztu .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#qtguximztu .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#qtguximztu .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qtguximztu .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#qtguximztu .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#qtguximztu .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#qtguximztu .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#qtguximztu .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#qtguximztu .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qtguximztu .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#qtguximztu .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#qtguximztu .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#qtguximztu .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#qtguximztu .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#qtguximztu .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qtguximztu .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#qtguximztu .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#qtguximztu .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#qtguximztu .gt_left {
+  text-align: left;
+}
+
+#qtguximztu .gt_center {
+  text-align: center;
+}
+
+#qtguximztu .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#qtguximztu .gt_font_normal {
+  font-weight: normal;
+}
+
+#qtguximztu .gt_font_bold {
+  font-weight: bold;
+}
+
+#qtguximztu .gt_font_italic {
+  font-style: italic;
+}
+
+#qtguximztu .gt_super {
+  font-size: 65%;
+}
+
+#qtguximztu .gt_footnote_marks {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="qtguximztu" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+  <thead class="gt_header">
+    <tr>
+      <th colspan="3" class="gt_heading gt_title gt_font_normal" style="color: black; text-align: left; font-weight: bold;">The top ten DT in the Modern Era</th>
+    </tr>
+    <tr>
+      <th colspan="3" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style="color: black; text-align: left;">Suh sits in the top 10 right at the 6th spot. His TFL and Solo's rank right there with the greats.</th>
+    </tr>
+  </thead>
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">Player</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Tackles for Loss</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">Solo Tackles</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">John Randle</td>
+      <td class="gt_row gt_right">40</td>
+      <td class="gt_row gt_right">471</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Warren Sapp</td>
+      <td class="gt_row gt_right">91</td>
+      <td class="gt_row gt_right">440</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Aaron Donald</td>
+      <td class="gt_row gt_right">131</td>
+      <td class="gt_row gt_right">247</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Cortez Kennedy</td>
+      <td class="gt_row gt_right">15</td>
+      <td class="gt_row gt_right">569</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Kevin Williams</td>
+      <td class="gt_row gt_right">113</td>
+      <td class="gt_row gt_right">370</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Ndamukong Suh</td>
+      <td class="gt_row gt_right" style="color: red; font-weight: bold;">123</td>
+      <td class="gt_row gt_right" style="color: red; font-weight: bold;">373</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Geno Atkins</td>
+      <td class="gt_row gt_right">100</td>
+      <td class="gt_row gt_right">228</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Fletcher Cox</td>
+      <td class="gt_row gt_right">71</td>
+      <td class="gt_row gt_right">288</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Bryant Young</td>
+      <td class="gt_row gt_right">93</td>
+      <td class="gt_row gt_right">519</td>
+    </tr>
+    <tr>
+      <td class="gt_row gt_left" style="color: black; font-size: 18; font-weight: bold;">Haloti Ngata</td>
+      <td class="gt_row gt_right">63</td>
+      <td class="gt_row gt_right">329</td>
+    </tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="3">By Aaron Mittlieder</td>
+    </tr>
+    <tr>
+      <td class="gt_sourcenote" colspan="3">Source: <a href="https://www.pro-football-reference.com/">Pro Football Reference</a></td>
+    </tr>
+  </tfoot>
+  
+</table></div>
+<p>Now I want to see all the defensive tackles in the modern era. This scatter plot I made shows how many career combined tackles that each player has through their amount of games they have played. Total tackles is a very important statistic to excel at when we are talking about the Hall of Fame. The red dot on this chart is Suh. You can already notice that he is above the trend line making him above average without a doubt. The thing I really want you to focus on is the 2 green dots. That is Warren Sapp and John Randle. Those two HOFers sit right with Suh’s combined tackles but Suh has played significantly less games. He is on his way to shatter their tackle stats and Suh isn’t done yet.</p>
+<p>The orange dot on this scatter plot is Bengals legend Geno Atkins. Geno has 10 pro bowls, and i’m no sports scientist but 10 pro bowls usually means you’re very likely to make the HOF. Of course Suh is miles higher than Geno on this plot, and it looks like Geno wont ever catch up. Bottom line is Suh isn’t far behind any HOF status player statistically.</p>
+<pre class="r"><code>moderndtstats %&gt;%
+ggplot() + 
+  geom_point(data=moderndtstats, aes(x=G, y=Comb), color=&quot;grey&quot;)  +
+  geom_point(data=suh, aes(x=G, y=Comb), color=&quot;red&quot;) +
+  geom_point(data=randle, aes(x=G, y=Comb), color=&quot;green&quot;) +
+  geom_point(data=sapp, aes(x=G, y=Comb), color=&quot;green&quot;) +
+  geom_point(data=donald, aes(x=G, y=Comb), color=&quot;blue&quot;) +
+  geom_point(data=atkins, aes(x=G, y=Comb), color=&quot;orange&quot;) + 
+  geom_smooth(data=moderndtstats, aes(x=G, y=Comb), method=&quot;lm&quot;,se=FALSE) +
+  labs(x=&quot;Games Played&quot;, y=&quot;Career Combined Tackles&quot;, title=&quot;Defensive Tackle&#39;s Combined Tackles in Their Career&quot;, subtitle=&quot;Career longevity is key to the HOF and Suh has a long career accompanied with\n a fair amount of combined tackles.&quot;, caption=&quot;Source: Pro Football Reference | By Aaron Mittlieder&quot;) +
+  theme_minimal() +
+   theme(
+    plot.title = element_text(size = 18, face = &quot;bold&quot;),
+    axis.title = element_text(size = 11), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    ) </code></pre>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="/2021/03/29/is-ndamukong-suh-a-hof/index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>For the last graph, I made up a bar chart that shows where exactly are these players on the HOF monitor status. I grabbed the top 10 once again. I’m going to state the obvious, Suh is sitting at 6th in this list. Geno is expected to retire and get a handshake from David Baker’s hand at some point. (For those of you that don’t know, David Baker is the old guy who tells all these players personally if they have made it in the Hall of Fame).</p>
+<p>As well, Suh is still not done with his career like we talked about, and maybe even snag another ring while he is at it. He has room to improve and 6th place is unlikely to be his final spot on this list by the time he hangs up the cleats.</p>
+<pre class="r"><code>ggplot() + 
+  geom_bar(data=compare, aes(x=reorder(Player, HOFm), weight= HOFm)) + 
+  geom_bar(data=suh, aes(x=reorder(Player, HOFm), weight= HOFm), fill=&quot;red&quot;) +
+  geom_bar(data=randle, aes(x=reorder(Player, HOFm), weight= HOFm), fill=&quot;green&quot;) +
+  geom_bar(data=sapp, aes(x=reorder(Player, HOFm), weight= HOFm), fill=&quot;green&quot;) +
+  geom_bar(data=atkins, aes(x=reorder(Player, HOFm), weight= HOFm), fill=&quot;orange&quot;) +
+  coord_flip() + 
+  labs(x=&quot;Players&quot;, y=&quot;Hall of Fame Monitor&quot;, title=&quot;Top 10 Hall of Fame Monitor DT&#39;s in the Modern Era&quot;, subtitle=&quot;Suh is ranked 6th, and he has room to improve knowing his career hasnt finished yet.&quot;, caption=&quot;Source: Pro Football Reference | By Aaron Mittlieder&quot;) +
+  theme_minimal() +
+   theme(
+    plot.title = element_text(size = 16, face = &quot;bold&quot;),
+    axis.title = element_text(size = 11), 
+    plot.subtitle = element_text(size=10), 
+    panel.grid.minor = element_blank()
+    ) </code></pre>
+<p><img src="/2021/03/29/is-ndamukong-suh-a-hof/index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+My big point here is that, after seeing these graphs, it’s safe to say Ndamukong Suh is a Hall of Fame player assuming he finishes his career like he started it.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
