@@ -6,13 +6,40 @@
     <description>Recent content in Categories on Aaron Mittlieder</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 29 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 20 Apr 2021 00:00:00 +0000</lastBuildDate><atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>football</title>
       <link>/categories/football/</link>
-      <pubDate>Mon, 29 Mar 2021 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 20 Apr 2021 00:00:00 +0000</pubDate>
       
       <guid>/categories/football/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>MVP</title>
+      <link>/categories/mvp/</link>
+      <pubDate>Tue, 20 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/mvp/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>NFL</title>
+      <link>/categories/nfl/</link>
+      <pubDate>Tue, 20 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/nfl/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>quarterback</title>
+      <link>/categories/quarterback/</link>
+      <pubDate>Tue, 20 Apr 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/quarterback/</guid>
       <description></description>
     </item>
     
@@ -22,15 +49,6 @@
       <pubDate>Mon, 29 Mar 2021 00:00:00 +0000</pubDate>
       
       <guid>/categories/hof/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>NFL</title>
-      <link>/categories/nfl/</link>
-      <pubDate>Mon, 29 Mar 2021 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/nfl/</guid>
       <description></description>
     </item>
     
